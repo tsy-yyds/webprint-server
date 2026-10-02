@@ -1,0 +1,10 @@
+# 运行时产物（不纳入版本库）
+__pycache__/
+*.pyc
+logs/
+jobs/
+打印输出/
+pid.txt
+
+# 生成的图标（运行 gen_icon.py 可再生成，仓库内用 icon.svg）
+*.png
