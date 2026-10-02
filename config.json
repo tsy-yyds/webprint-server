@@ -1,0 +1,9 @@
+{
+  "host": "0.0.0.0",
+  "port": 8000,
+  "pin": "",
+  "max_upload_mb": 100,
+  "default_printer": "auto",
+  "job_keep_days": 7,
+  "dpi_quality": { "draft": 150, "standard": 200, "high": 300 }
+}
