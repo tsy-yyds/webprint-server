@@ -1,16 +1,15 @@
 {
   "name": "共享打印",
-  "short_name": "共享打印",
+  "short_name": "打印",
+  "description": "把电脑上的打印机变成手机也能用的网络打印机",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#f3f6fb",
+  "orientation": "portrait",
+  "background_color": "#f1f5f9",
   "theme_color": "#2563eb",
+  "lang": "zh-CN",
   "icons": [
-    {
-      "src": "/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
   ]
 }
