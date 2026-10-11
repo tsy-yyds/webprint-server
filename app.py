@@ -17,16 +17,19 @@
 import json
 import logging
 import os
+import shutil
 import socket
 import sys
 import threading
 import time
 import traceback
+import urllib.parse
+import uuid
 import webbrowser
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-from flask import Flask, abort, jsonify, request, send_from_directory
+from flask import Flask, abort, jsonify, request, send_file, send_from_directory
 
 BASE_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(BASE_DIR))
@@ -260,6 +263,76 @@ def api_print():
     return jsonify({'ok': True, 'job_id': job['id']})
 
 
+# ============================================================ App 分享预置文件
+# 微信 / QQ 等"用其他应用打开"→ 共享打印 App → 文件先传到这里暂存，
+# 网页打印页通过 ?pre=<id> 自动取回并加入待打印列表（App 与网页版功能一致）。
+PRELOAD_DIR = BASE_DIR / 'preload'
+PRELOAD_TTL = 86400  # 24 小时后自动清理
+
+
+def _clean_preload():
+    try:
+        PRELOAD_DIR.mkdir(exist_ok=True)
+        now = time.time()
+        for n in os.listdir(str(PRELOAD_DIR)):
+            p = PRELOAD_DIR / n
+            if p.is_dir() and now - p.stat().st_mtime > PRELOAD_TTL:
+                shutil.rmtree(str(p), ignore_errors=True)
+    except Exception:
+        pass
+
+
+_clean_preload()
+
+
+@app.post('/api/preload')
+def api_preload_upload():
+    if not check_auth():
+        return jsonify({'ok': False, 'error': 'PIN 不正确'}), 403
+    files = [f for f in request.files.getlist('files') if f and f.filename]
+    if not files:
+        _log('分享上传失败：没有收到文件（files=%d）' % len(request.files.getlist('files')))
+        return jsonify({'ok': False, 'error': '没有收到文件'}), 400
+    _clean_preload()
+    pid = uuid.uuid4().hex[:12]
+    d = PRELOAD_DIR / pid
+    d.mkdir(parents=True, exist_ok=True)
+    saved = []
+    for f in files:
+        name = os.path.basename(f.filename or 'share.bin') or 'share.bin'
+        f.save(str(d / name))
+        saved.append({'name': name, 'size': (d / name).stat().st_size})
+    _log('分享上传成功 %s：%s' % (pid, ','.join(x['name'] for x in saved)))
+    return jsonify({'ok': True, 'id': pid, 'files': saved})
+
+
+@app.get('/api/preload/<pid>')
+def api_preload_info(pid):
+    d = PRELOAD_DIR / pid
+    if not d.is_dir():
+        return jsonify({'ok': False, 'error': '文件不存在或已过期'}), 404
+    lst = [{'name': n, 'size': (d / n).stat().st_size}
+           for n in os.listdir(str(d)) if (d / n).is_file()]
+    return jsonify({'ok': True, 'id': pid, 'files': lst})
+
+
+@app.get('/api/preload/<pid>/raw')
+def api_preload_raw(pid):
+    if not check_auth():
+        return jsonify({'ok': False, 'error': 'PIN 不正确'}), 403
+    d = PRELOAD_DIR / pid
+    if not d.is_dir():
+        return jsonify({'ok': False, 'error': '文件不存在或已过期'}), 404
+    names = [n for n in os.listdir(str(d)) if (d / n).is_file()]
+    if not names:
+        return jsonify({'ok': False, 'error': '没有文件'}), 404
+    name = names[0]
+    resp = send_file(str(d / name), as_attachment=False,
+                     download_name=name, mimetype='application/octet-stream')
+    resp.headers['X-File-Name'] = urllib.parse.quote(name)
+    return resp
+
+
 @app.post('/api/test-print')
 def api_test_print():
     if not check_auth():
@@ -437,7 +510,23 @@ def _start_tray():
 
 
 # ============================================================ 主入口
+def _port_in_use(port):
+    """检测端口是否已被占用（不设 SO_REUSEADDR，避免双进程同端口）"""
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.bind(('0.0.0.0', port))
+        return False
+    except OSError:
+        return True
+    finally:
+        s.close()
+
+
 def main():
+    if _port_in_use(PORT):
+        _log('端口 %d 已被占用，打印服务可能已在运行，本次不重复启动' % PORT)
+        raise SystemExit(0)
+
     (BASE_DIR / 'pid.txt').write_text(str(os.getpid()), encoding='utf-8')
 
     _log('=' * 56)
