@@ -3,256 +3,446 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>共享打印 · 把 USB 打印机变成手机也能用的网络打印机</title>
-<meta name="description" content="免费开源的共享打印服务：电脑上的 USB 打印机，手机和电脑在局域网或外网都能直接打印。支持 PDF/图片/Word/Excel/PPT，手动双面、打印到 PDF。">
+<title>共享打印 · 把家里的 USB 打印机变成手机也能用的网络打印机</title>
+<meta name="description" content="免费开源的共享打印：电脑上的 USB 打印机，手机和电脑在局域网或外网都能直接打印。服务端 exe / 安卓 App / 电脑客户端，三端齐全。支持 PDF、图片、Word、Excel、PPT，手动双面、打印到 PDF。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231B5FBF'/%3E%3Cpath d='M20 24h24v22H20z' fill='%23fff'/%3E%3Crect x='15' y='14' width='34' height='12' rx='3' fill='%23fff'/%3E%3Crect x='26' y='34' width='12' height='8' rx='2' fill='%231B5FBF'/%3E%3C/svg%3E">
 <style>
   :root{
-    --paper:#FAFAF6;
-    --card:#FFFFFF;
-    --ink:#1F2328;
-    --ink-soft:#4B5563;
-    --line:#E5E7EB;
-    --blue:#1B5FBF;
-    --blue-deep:#154A97;
-    --blue-soft:#EAF1FB;
-    --ok:#0E7A4D;
+    --paper:#FAFAF6; --card:#FFFFFF; --ink:#1F2328; --ink-soft:#57606A;
+    --line:#E6E8EB; --blue:#1B5FBF; --blue-deep:#154A97; --blue-soft:#EAF1FB;
+    --ok:#0E7A4D; --warn-bg:#FFF7E6; --warn-line:#F5C76A;
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html{scroll-behavior:smooth}
-  body{
-    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
-    background:var(--paper);color:var(--ink);
-    line-height:1.75;font-size:16px;-webkit-font-smoothing:antialiased;
-  }
-  .wrap{max-width:860px;margin:0 auto;padding:0 20px}
+  body{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.75;font-size:16px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:0 22px}
+  a{color:var(--blue);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* ===== 导航 ===== */
+  nav{position:sticky;top:0;z-index:50;background:rgba(250,250,246,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:56px}
+  .brand{display:inline-flex;align-items:center;gap:9px;font-weight:800;font-size:17px;color:var(--ink);min-height:44px}
+  .brand svg{width:26px;height:26px}
+  .nav-links{display:flex;gap:26px;font-size:14px}
+  .nav-links a{color:var(--ink-soft);font-weight:500;padding:8px 0;display:inline-block}
+  .nav-links a:hover{color:var(--blue);text-decoration:none}
 
   /* ===== Hero ===== */
-  header.hero{padding:72px 0 48px;border-bottom:1px solid var(--line)}
-  .kicker{
-    display:inline-flex;align-items:center;gap:8px;
-    font-size:13px;color:var(--blue);font-weight:600;
-    background:var(--blue-soft);border-radius:999px;padding:4px 14px;margin-bottom:22px;
-  }
-  .kicker svg{width:14px;height:14px}
-  h1{font-size:40px;line-height:1.25;font-weight:800;letter-spacing:-0.5px}
+  header.hero{padding:76px 0 56px;border-bottom:1px solid var(--line);overflow:hidden}
+  .hero-inner{display:grid;grid-template-columns:1.15fr .85fr;gap:44px;align-items:center}
+  .kicker{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--blue);font-weight:600;background:var(--blue-soft);border-radius:999px;padding:4px 14px;margin-bottom:22px}
+  h1{font-size:42px;line-height:1.22;font-weight:800;letter-spacing:-.5px}
   h1 .accent{color:var(--blue)}
-  .sub{font-size:18px;color:var(--ink-soft);max-width:34em;margin-top:16px}
+  .sub{font-size:17px;color:var(--ink-soft);max-width:36em;margin-top:16px}
+  .meta-line{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:26px;font-size:14px;color:var(--ink-soft)}
+  .meta-line span{display:inline-flex;align-items:center;gap:6px}
+  .meta-line svg{width:14px;height:14px;color:var(--ok)}
   .cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
-  .btn{
-    display:inline-flex;align-items:center;gap:8px;
-    padding:12px 22px;border-radius:10px;font-size:15px;font-weight:600;
-    text-decoration:none;transition:transform .15s ease,box-shadow .15s ease;
-  }
-  .btn svg{width:16px;height:16px}
-  .btn-primary{background:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(27,95,191,.25)}
-  .btn-primary:hover{background:var(--blue-deep);transform:translateY(-1px)}
+  .btn{display:inline-flex;align-items:center;gap:9px;padding:13px 24px;border-radius:10px;font-size:15px;font-weight:600;transition:transform .15s ease,box-shadow .15s ease}
+  .btn svg{width:17px;height:17px}
+  .btn-primary{background:var(--blue);color:#fff;box-shadow:0 2px 10px rgba(27,95,191,.28)}
+  .btn-primary:hover{background:var(--blue-deep);transform:translateY(-1px);text-decoration:none}
   .btn-ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
-  .btn-ghost:hover{border-color:var(--blue);color:var(--blue)}
-  .hero-facts{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:34px;font-size:14px;color:var(--ink-soft)}
-  .hero-facts b{color:var(--ink);font-weight:700}
-  .hero-fact{display:inline-flex;align-items:center;gap:7px}
-  .hero-fact svg{width:15px;height:15px;color:var(--ok)}
+  .btn-ghost:hover{border-color:var(--blue);color:var(--blue);text-decoration:none}
+  .hero-art{display:flex;align-items:center;justify-content:center}
+  .hero-art svg{width:100%;max-width:360px;height:auto}
 
-  /* ===== 区块通用 ===== */
-  section{padding:56px 0;border-bottom:1px solid var(--line)}
-  .sec-head{margin-bottom:32px}
-  .sec-head h2{font-size:26px;font-weight:800;letter-spacing:-0.3px}
+  /* ===== 区块 ===== */
+  section{padding:60px 0;border-bottom:1px solid var(--line)}
+  .sec-head{margin-bottom:36px}
+  .sec-head h2{font-size:27px;font-weight:800;letter-spacing:-.3px}
   .sec-head p{color:var(--ink-soft);margin-top:8px;font-size:15px}
+  .lead{font-size:16px;color:var(--ink-soft);max-width:60em}
+  .lead b{color:var(--ink)}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin-top:26px;font-size:15px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 22px}
+  .flow .node{display:inline-flex;align-items:center;gap:8px;font-weight:600}
+  .flow .node svg{width:18px;height:18px;color:var(--blue)}
+  .flow .arrow{color:var(--ink-soft);font-weight:700}
 
-  /* ===== 功能网格 ===== */
+  /* ===== 档案表 ===== */
+  .file-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px 30px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 28px}
+  .file-row{display:flex;gap:14px;font-size:15px;border-bottom:1px dashed var(--line);padding:8px 0}
+  .file-row:last-child{border-bottom:none}
+  .file-row dt{color:var(--ink-soft);flex:0 0 92px;font-weight:500}
+  .file-row dd{font-weight:600}
+
+  /* ===== 特色 ===== */
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  .card{
-    background:var(--card);border:1px solid var(--line);border-radius:12px;
-    padding:24px;display:flex;gap:16px;align-items:flex-start;
-  }
-  .card-icon{
-    flex:0 0 42px;width:42px;height:42px;border-radius:10px;
-    background:var(--blue-soft);color:var(--blue);
-    display:flex;align-items:center;justify-content:center;
-  }
-  .card-icon svg{width:22px;height:22px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px;display:flex;gap:16px;align-items:flex-start}
+  .card-icon{flex:0 0 44px;width:44px;height:44px;border-radius:10px;background:var(--blue-soft);color:var(--blue);display:flex;align-items:center;justify-content:center}
+  .card-icon svg{width:23px;height:23px}
   .card h3{font-size:16px;font-weight:700;margin-bottom:4px}
   .card p{font-size:14px;color:var(--ink-soft)}
 
-  /* ===== 步骤 ===== */
+  /* ===== 下载 ===== */
+  .dl-tabs{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap}
+  .dl-tab{padding:11px 20px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:14px;font-weight:600;color:var(--ink-soft);cursor:pointer;font-family:inherit;min-height:44px}
+  .dl-tab.active{background:var(--blue);border-color:var(--blue);color:#fff}
+  .dl-panel{display:none}
+  .dl-panel.active{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .dl-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 30px}
+  .dl-head{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .dl-title{display:flex;align-items:center;gap:14px}
+  .dl-title .card-icon{flex:0 0 52px;width:52px;height:52px}
+  .dl-title h3{font-size:19px;font-weight:800}
+  .dl-title .ver{display:inline-block;font-size:12px;background:var(--blue-soft);color:var(--blue-deep);border-radius:6px;padding:1px 8px;margin-left:8px;vertical-align:2px}
+  .dl-desc{font-size:14px;color:var(--ink-soft);max-width:52em;margin-bottom:18px}
+  .dl-table{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;font-size:14px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin-bottom:22px}
+  .dl-table div span{display:block;color:var(--ink-soft);margin-bottom:2px;font-size:13px}
+  .dl-table div b{font-weight:600;font-size:14px}
+  .dl-btns{display:flex;flex-wrap:wrap;gap:12px}
+  .btn-dl{background:var(--blue);color:#fff;font-size:16px;padding:14px 30px;border-radius:10px;font-weight:700;box-shadow:0 2px 10px rgba(27,95,191,.28)}
+  .btn-dl:hover{background:var(--blue-deep);transform:translateY(-1px);text-decoration:none}
+  .btn-alt{background:var(--card);border:1px solid var(--line);color:var(--ink);font-size:14px;padding:12px 22px}
+  .btn-alt:hover{border-color:var(--blue);color:var(--blue);text-decoration:none}
+  .warn{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:10px;padding:14px 18px;font-size:14px;color:#7A5A00;margin-top:18px}
+
+  /* ===== 指引 ===== */
   .steps{counter-reset:step;display:grid;gap:14px}
-  .step{
-    counter-increment:step;background:var(--card);
-    border:1px solid var(--line);border-radius:12px;padding:20px 22px;
-    display:flex;gap:18px;align-items:flex-start;
-  }
-  .step::before{
-    content:counter(step);flex:0 0 34px;width:34px;height:34px;
-    border-radius:50%;background:var(--blue);color:#fff;
-    font-weight:700;font-size:15px;
-    display:flex;align-items:center;justify-content:center;margin-top:2px;
-  }
+  .step{counter-increment:step;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;display:flex;gap:18px;align-items:flex-start}
+  .step::before{content:counter(step);flex:0 0 34px;width:34px;height:34px;border-radius:50%;background:var(--blue);color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;margin-top:2px}
   .step h3{font-size:16px;font-weight:700;margin-bottom:2px}
   .step p{font-size:14px;color:var(--ink-soft)}
-  .step code{
-    font-family:Consolas,"Courier New",monospace;font-size:13px;
-    background:var(--blue-soft);color:var(--blue-deep);
-    border-radius:5px;padding:1px 7px;
-  }
-  .step a{color:var(--blue);text-decoration:none;font-weight:600}
-  .step a:hover{text-decoration:underline}
-
-  /* ===== 下载 APK 提示 ===== */
-  .note{
-    background:var(--card);border:1px solid var(--line);border-left:4px solid var(--blue);
-    border-radius:10px;padding:20px 22px;font-size:14px;color:var(--ink-soft);
-  }
-  .note b{color:var(--ink)}
+  .step code{font-family:Consolas,"Courier New",monospace;font-size:13px;background:var(--blue-soft);color:var(--blue-deep);border-radius:5px;padding:1px 7px}
 
   /* ===== FAQ ===== */
   .faq{display:grid;gap:14px}
-  details{
-    background:var(--card);border:1px solid var(--line);border-radius:10px;
-    padding:16px 20px;
-  }
-  details summary{
-    cursor:pointer;font-weight:600;font-size:15px;
-    list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;
-  }
+  details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 20px}
+  details summary{cursor:pointer;font-weight:600;font-size:15px;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
   details summary::-webkit-details-marker{display:none}
-  details summary::after{
-    content:"";flex:0 0 10px;width:10px;height:10px;
-    border-right:2px solid var(--ink-soft);border-bottom:2px solid var(--ink-soft);
-    transform:rotate(45deg);transition:transform .2s ease;margin-top:-4px;
-  }
+  details summary::after{content:"";flex:0 0 10px;width:10px;height:10px;border-right:2px solid var(--ink-soft);border-bottom:2px solid var(--ink-soft);transform:rotate(45deg);transition:transform .2s ease;margin-top:-4px}
   details[open] summary::after{transform:rotate(-135deg);margin-top:4px}
   details p{margin-top:12px;font-size:14px;color:var(--ink-soft)}
+
+  /* ===== 更新日志 ===== */
+  .changelog{display:grid;gap:16px}
+  .cl-item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 24px}
+  .cl-head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;margin-bottom:8px}
+  .cl-head b{font-size:16px}
+  .cl-head time{font-size:13px;color:var(--ink-soft)}
+  .cl-head .tag{font-size:12px;background:var(--blue-soft);color:var(--blue-deep);border-radius:6px;padding:1px 8px}
+  .cl-item ul{margin-left:20px;font-size:14px;color:var(--ink-soft)}
+  .cl-item li{margin:3px 0}
 
   /* ===== footer ===== */
   footer{padding:40px 0 64px;color:var(--ink-soft);font-size:14px}
   footer .wrap{display:flex;flex-wrap:wrap;gap:10px 24px;justify-content:space-between;align-items:center}
-  footer a{color:var(--blue);text-decoration:none}
-  footer a:hover{text-decoration:underline}
+  footer a{color:var(--blue)}
 
-  @media (max-width:640px){
+  @media (max-width:760px){
     h1{font-size:31px}
     .sub{font-size:16px}
-    header.hero{padding:52px 0 36px}
+    .hero-inner{grid-template-columns:1fr;gap:30px}
+    .hero-art{order:-1}
+    .hero-art svg{max-width:240px}
+    header.hero{padding:52px 0 40px}
     section{padding:44px 0}
     .grid{grid-template-columns:1fr}
+    .file-grid{grid-template-columns:1fr}
+    .nav-links{display:none}
     .cta-row .btn{flex:1 1 100%;justify-content:center}
+    .dl-card{padding:22px 20px}
   }
-  @media (prefers-reduced-motion:reduce){
-    html{scroll-behavior:auto}
-    .btn{transition:none}
-  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn{transition:none}}
 </style>
 </head>
 <body>
 
-<header class="hero">
+<nav>
   <div class="wrap">
-    <span class="kicker">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 17v4h12v-4"/></svg>
-      免费 · 开源 · 免注册
-    </span>
-    <h1>把家里的 USB 打印机，<br>变成<span class="accent">手机也能用</span>的网络打印机</h1>
-    <p class="sub">打印机不需要支持网络功能，电脑也不用公网 IP。装好之后，手机和电脑在同一 WiFi 下直接打印；人在外面，用免费穿透也能远程打印。</p>
-    <div class="cta-row">
-      <a class="btn btn-primary" href="https://github.com/tsy-yyds/webprint-server/tree/main/apk">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
-        获取安卓 App
-      </a>
-      <a class="btn btn-ghost" href="https://github.com/tsy-yyds/webprint-server/blob/main/使用说明.md">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-        完整使用说明
-      </a>
+    <a class="brand" href="#top">
+      <svg viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#1B5FBF"/><path d="M20 24h24v22H20z" fill="#fff"/><rect x="15" y="14" width="34" height="12" rx="3" fill="#fff"/><rect x="26" y="34" width="12" height="8" rx="2" fill="#1B5FBF"/></svg>
+      共享打印
+    </a>
+    <div class="nav-links">
+      <a href="#intro">介绍</a>
+      <a href="#features">特色</a>
+      <a href="#download">下载</a>
+      <a href="https://github.com/tsy-yyds/webprint-server">GitHub</a>
     </div>
-    <div class="hero-facts">
-      <span class="hero-fact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>不需要网络打印机</span></span>
-      <span class="hero-fact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>支持 <b>PDF / 图片 / TXT / Word / Excel / PPT</b></span></span>
-      <span class="hero-fact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span>手机 / 电脑 / 外网都能打</span></span>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap hero-inner">
+    <div>
+      <span class="kicker">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 17v4h12v-4"/></svg>
+        免费 · 开源 · 免注册
+      </span>
+      <h1>把家里的 USB 打印机，<br>变成<span class="accent">手机也能用</span>的网络打印机</h1>
+      <p class="sub">打印机不需要支持网络功能，电脑也不需要公网 IP。装好服务端，手机和电脑在同一 WiFi 下直接打印；人在外面，用免费穿透也能远程打印。</p>
+      <div class="meta-line">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>服务端免装 Python</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>支持 PDF / 图片 / Word / Excel / PPT</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Windows · 安卓 · 三端齐全</span>
+      </div>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#download">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+          立即下载
+        </a>
+        <a class="btn btn-ghost" href="#intro">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          先看看介绍
+        </a>
+      </div>
+    </div>
+    <div class="hero-art">
+      <svg viewBox="0 0 360 260" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <ellipse cx="180" cy="236" rx="150" ry="14" fill="#EDEFF2"/>
+        <g stroke="#1B5FBF" stroke-width="2.5" stroke-linecap="round">
+          <path d="M96 118c0-20 16-36 36-36h96c20 0 36 16 36 36v54c0 20-16 36-36 36H132c-20 0-36-16-36-36v-54z"/>
+          <path d="M110 96h140c14 0 24 10 24 24v18H86v-18c0-14 10-24 24-24z"/>
+        </g>
+        <g fill="#fff" stroke="#E0E3E7" stroke-width="1.5">
+          <rect x="132" y="88" width="96" height="44" rx="8"/>
+        </g>
+        <g fill="#1B5FBF">
+          <rect x="150" y="100" width="60" height="6" rx="3"/>
+          <rect x="150" y="114" width="46" height="6" rx="3"/>
+        </g>
+        <g fill="#fff" stroke="#E0E3E7" stroke-width="1.5">
+          <rect x="150" y="150" width="60" height="34" rx="8"/>
+        </g>
+        <circle cx="196" cy="167" r="3.5" fill="#1B5FBF"/>
+        <path d="M228 156l18 10-18 10z" fill="#1B5FBF"/>
+        <g stroke="#9AA4AF" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 6">
+          <path d="M78 178c-10-4-14-14-10-22s16-10 22-4"/>
+          <path d="M282 178c10-4 14-14 10-22s-16-10-22-4"/>
+        </g>
+        <g>
+          <rect x="40" y="204" width="64" height="22" rx="6" fill="#fff" stroke="#E0E3E7" stroke-width="1.5"/>
+          <rect x="48" y="210" width="24" height="10" rx="2" fill="#EAF1FB"/>
+          <path d="M120 202v-6h16v6" stroke="#1B5FBF" stroke-width="2" fill="none"/>
+          <rect x="120" y="204" width="18" height="18" rx="4" fill="#fff" stroke="#E0E3E7" stroke-width="1.5"/>
+        </g>
+        <g>
+          <rect x="256" y="204" width="64" height="22" rx="6" fill="#fff" stroke="#E0E3E7" stroke-width="1.5"/>
+          <rect x="276" y="210" width="28" height="10" rx="2" fill="#EAF1FB"/>
+          <path d="M224 202v-6h16v6" stroke="#1B5FBF" stroke-width="2" fill="none"/>
+          <rect x="222" y="204" width="18" height="18" rx="4" fill="#fff" stroke="#E0E3E7" stroke-width="1.5"/>
+        </g>
+        <text x="180" y="146" text-anchor="middle" font-size="13" font-weight="700" fill="#57606A" font-family="system-ui">USB</text>
+      </svg>
     </div>
   </div>
 </header>
 
-<!-- ===== 功能 ===== -->
-<section>
+<!-- ===== 介绍 ===== -->
+<section id="intro">
   <div class="wrap">
     <div class="sec-head">
-      <h2>它能做什么</h2>
-      <p>一个装在打印电脑上的小服务，把打印这件事变简单。</p>
+      <h2>它是什么</h2>
+    </div>
+    <p class="lead">这是一套装在<b>打印电脑</b>上的小服务，外加手机 App 和电脑客户端。打印机只要用 USB 线连在电脑上（不支持网络打印也没关系），整个家里的人——甚至你在外面——都能把自己的文件发过来打印。</p>
+    <div class="flow">
+      <span class="node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M12 18h.01"/></svg>手机 / 电脑 / 外面</span>
+      <span class="arrow">→</span>
+      <span class="node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/></svg>局域网 / 免费外网穿透</span>
+      <span class="arrow">→</span>
+      <span class="node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 17v4h12v-4"/></svg>打印电脑上的共享打印服务</span>
+      <span class="arrow">→</span>
+      <span class="node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>USB 打印机出纸</span>
+    </div>
+    <div class="file-grid" style="margin-top:26px">
+      <div class="file-row"><dt>软件名称</dt><dd>共享打印</dd></div>
+      <div class="file-row"><dt>软件类型</dt><dd>打印 / 共享工具</dd></div>
+      <div class="file-row"><dt>运行平台</dt><dd>Windows 10/11 · Android 7+</dd></div>
+      <div class="file-row"><dt>当前版本</dt><dd>服务端 1.1 · 手机端 1.9 · 电脑端 1.0</dd></div>
+      <div class="file-row"><dt>软件语言</dt><dd>简体中文</dd></div>
+      <div class="file-row"><dt>收费方式</dt><dd>完全免费 · 开源</dd></div>
+      <div class="file-row"><dt>更新日期</dt><dd>2026-10-11</dd></div>
+      <div class="file-row"><dt>开发作者</dt><dd>tsy-yyds</dd></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 特色 ===== -->
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>核心特色</h2>
+      <p>不挑打印机、不挑电脑，把打印这件小事做顺。</p>
     </div>
     <div class="grid">
       <div class="card">
         <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 17v4h12v-4"/><path d="M18 13h.01"/></svg></div>
-        <div><h3>打印到纸</h3><p>上传文件、选打印机、调份数/方向/纸张/缩放，点一下开始打印，后台队列逐个输出。</p></div>
+        <div><h3>打印到纸</h3><p>上传 PDF / 图片 / TXT / Word / Excel / PPT，选打印机、调份数方向纸张，点一下开始打印，后台队列逐个输出。</p></div>
       </div>
       <div class="card">
         <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8L12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/><path d="M9 10.5v2"/><path d="M15 10.5v2"/></svg></div>
-        <div><h3>手动双面</h3><p>手动双面打印机友好：先打奇数面，手机弹出图文教程提示翻面放纸，点「下一步」再打背面，页码不乱。</p></div>
+        <div><h3>手动双面</h3><p>手动双面打印机友好：先打奇数面，手机弹出图文教程提示翻面放纸，点「下一步」再打背面，页码不乱，支持取消重打。</p></div>
       </div>
       <div class="card">
         <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/></svg></div>
-        <div><h3>打印到 PDF</h3><p>不想费纸？把文件转成 PDF 存到电脑「打印输出」文件夹，手机或电脑随时下载。</p></div>
+        <div><h3>打印到 PDF</h3><p>不想费纸？把文件转成 PDF 存到电脑「打印输出」文件夹，手机或电脑随时下载，多文件自动合并成一册。</p></div>
       </div>
       <div class="card">
         <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/></svg></div>
-        <div><h3>外网也能打</h3><p>人在外面想打印？免费方案二选一：cpolar（手机零安装）或 Tailscale（地址固定），详见使用说明。</p></div>
+        <div><h3>外网也能打</h3><p>人在外面想打印？免费方案二选一：cpolar（手机零安装）或 Tailscale（地址固定），远程照打不误。</p></div>
+      </div>
+      <div class="card">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M7 18v2h10v-2"/></svg></div>
+        <div><h3>电脑客户端</h3><p>不依赖浏览器，独立桌面应用：选文件、选打印机、调打印方式，窗口里完成全部打印操作。</p></div>
+      </div>
+      <div class="card">
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="16" r="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div><h3>访问密码</h3><p>开放到外网时可在配置里设置 PIN 密码，任何人打开都要先输密码，防止别人乱打。</p></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===== 快速开始 ===== -->
-<section>
+<!-- ===== 下载 ===== -->
+<section id="download">
   <div class="wrap">
     <div class="sec-head">
-      <h2>三分钟用起来</h2>
-      <p>只需要一台 Windows 电脑 + 一根 USB 连接打印机的线。</p>
+      <h2>下载共享打印</h2>
+      <p>三端齐全：打印电脑装服务端，手机装 App，其他电脑装客户端。全部免费。</p>
+    </div>
+    <div class="dl-tabs" role="tablist">
+      <button class="dl-tab active" data-tab="server" type="button">服务端（打印电脑）</button>
+      <button class="dl-tab" data-tab="phone" type="button">手机端（安卓 App）</button>
+      <button class="dl-tab" data-tab="desktop" type="button">电脑端（独立客户端）</button>
+    </div>
+
+    <!-- 服务端 -->
+    <div class="dl-panel active" id="panel-server" role="tabpanel">
+      <div class="dl-card">
+        <div class="dl-head">
+          <div class="dl-title">
+            <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 17v4h12v-4"/><path d="M18 13h.01"/></svg></span>
+            <div><h3>共享打印服务<span class="ver">v1.1</span></h3></div>
+          </div>
+          <a class="btn btn-alt" href="https://github.com/tsy-yyds/webprint-server/releases">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-5-2.5S3.5 12 6 12c1.5 0 2.5 1 2.5 1S9 9.5 12 8.5c0-1 .5-2.5 1-4C14.5 6 14 8 14.5 9c1-.5 2-1.5 3.5-2-1 1.5-.5 3 0 4 1.5-.5 2.5-.5 3.5-.5 0 1.5-1 2.5-2 3.5 0 5-5.5 5.5-7 4.5z"/></svg>
+            GitHub 发布页
+          </a>
+        </div>
+        <p class="dl-desc">装在打印电脑上的核心服务：手机 / 其他电脑通过它调用打印机。已打包成单文件 exe，<b>无需安装 Python</b>，双击运行、自动打开网页、托盘常驻，支持开机自启。</p>
+        <div class="dl-table">
+          <div><span>文件名</span><b>共享打印服务.exe</b></div>
+          <div><span>版本</span><b>1.1</b></div>
+          <div><span>平台</span><b>Windows 10 / 11（64 位）</b></div>
+          <div><span>大小</span><b>约 45 MB</b></div>
+          <div><span>更新日期</span><b>2026-10-11</b></div>
+          <div><span>收费</span><b>免费 · 开源</b></div>
+        </div>
+        <div class="dl-btns">
+          <a class="btn btn-dl" href="https://github.com/tsy-yyds/webprint-server/releases">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            下载服务端
+          </a>
+          <a class="btn btn-alt" href="https://github.com/tsy-yyds/webprint-server/blob/main/使用说明.md">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            查看使用说明
+          </a>
+        </div>
+        <div class="warn">本程序为个人开发者制作，尚未购买代码签名证书。若 Windows 弹出 SmartScreen 拦截，点击「更多信息」→「仍要运行」继续，属正常现象。</div>
+      </div>
+    </div>
+
+    <!-- 手机端 -->
+    <div class="dl-panel" id="panel-phone" role="tabpanel">
+      <div class="dl-card">
+        <div class="dl-head">
+          <div class="dl-title">
+            <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M12 18h.01"/></svg></span>
+            <div><h3>共享打印 · 安卓 App<span class="ver">v1.9</span></h3></div>
+          </div>
+          <a class="btn btn-alt" href="https://github.com/tsy-yyds/webprint-server/tree/main/apk">GitHub 源</a>
+        </div>
+        <p class="dl-desc">独立应用，不套壳。打开直接进入打印主界面，右上角连接服务器；微信 / QQ 收到文件 →「用其他应用打开」→ 选「共享打印」即可打印；支持手动双面翻面提示、打印到 PDF，打完自动清理手机暂存。</p>
+        <div class="dl-table">
+          <div><span>文件名</span><b>共享打印.apk</b></div>
+          <div><span>版本</span><b>1.9</b></div>
+          <div><span>平台</span><b>Android 7.0+</b></div>
+          <div><span>大小</span><b>约 37 KB</b></div>
+          <div><span>更新日期</span><b>2026-10-11</b></div>
+          <div><span>收费</span><b>免费</b></div>
+        </div>
+        <div class="dl-btns">
+          <a class="btn btn-dl" href="https://github.com/tsy-yyds/webprint-server/tree/main/apk">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            获取安卓 App
+          </a>
+        </div>
+        <div class="warn">GitHub 不允许直接存放安装包文件，仓库以 13 个分块 + 还原脚本形式提供：下载全部放入同一文件夹 → 双击「还原APK.bat」→ 生成共享打印.apk → 发到手机安装，一键完成。</div>
+      </div>
+    </div>
+
+    <!-- 电脑端 -->
+    <div class="dl-panel" id="panel-desktop" role="tabpanel">
+      <div class="dl-card">
+        <div class="dl-head">
+          <div class="dl-title">
+            <span class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M7 18v2h10v-2"/></svg></span>
+            <div><h3>共享打印 · 电脑客户端<span class="ver">v1.0</span></h3></div>
+          </div>
+          <a class="btn btn-alt" href="https://github.com/tsy-yyds/webprint-server/tree/main/desktop">GitHub 源</a>
+        </div>
+        <p class="dl-desc">不依赖浏览器的独立桌面应用，与服务端分开安装：任何一台电脑装上它，填好服务端地址就能远程打印，操作和 App 一致。</p>
+        <div class="dl-table">
+          <div><span>文件名</span><b>共享打印桌面版.exe</b></div>
+          <div><span>版本</span><b>1.0</b></div>
+          <div><span>平台</span><b>Windows 10 / 11（64 位）</b></div>
+          <div><span>大小</span><b>约 15 MB</b></div>
+          <div><span>更新日期</span><b>2026-10-11</b></div>
+          <div><span>收费</span><b>免费</b></div>
+        </div>
+        <div class="dl-btns">
+          <a class="btn btn-dl" href="https://github.com/tsy-yyds/webprint-server/tree/main/desktop">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            获取电脑客户端
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 安装指引 ===== -->
+<section id="guide">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>三步装好</h2>
+      <p>以「服务端 + 手机」为例，整个过程约三分钟。</p>
     </div>
     <div class="steps">
       <div class="step">
-        <div><h3>装一次</h3><p>把工程文件夹拷到打印电脑上，双击 <code>install.bat</code>，等依赖装完（自动走清华镜像，国内快）。</p></div>
+        <div><h3>装服务端</h3><p>把 <code>共享打印服务.exe</code> 放到打印电脑上（建议放桌面或固定文件夹），双击运行。首次运行会自动生成配置文件，并打开打印网页。</p></div>
       </div>
       <div class="step">
-        <div><h3>启动服务</h3><p>双击 <code>start.bat</code>，后台静默运行、无黑窗口，自动打开打印网页。想开机自启用 <code>启用开机自启.bat</code>。</p></div>
+        <div><h3>手机连上</h3><p>手机连同一 WiFi，打开 App（或浏览器）输入电脑的局域网地址，例如 <code>http://192.168.3.17:8000</code>。地址在服务端网页底部能看到。</p></div>
       </div>
       <div class="step">
-        <div><h3>手机直接打</h3><p>手机连同一 WiFi，浏览器打开 <code>http://电脑IP:8000</code>，选文件、选打印方式，点「开始打印」。想让手机更像 App？浏览器「添加到主屏幕」，或直接用下面的安卓 App。</p></div>
+        <div><h3>选文件打印</h3><p>选文件、选打印机、调打印方式，点「开始打印」。手动双面时按提示翻面继续；人在外面就填外网地址（见使用说明）。</p></div>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== APK ===== -->
-<section>
-  <div class="wrap">
-    <div class="sec-head">
-      <h2>安卓 App「共享打印」</h2>
-      <p>微信 / QQ 里收到的文件，用其他应用打开，直接选「共享打印」就能打；打完自动清理手机暂存，不占空间。</p>
-    </div>
-    <div class="note">
-      <p><b>获取安装包：</b>打开 <a href="https://github.com/tsy-yyds/webprint-server/tree/main/apk">仓库 apk/ 文件夹</a>，下载 <b>13 个 <code>b64_part*.txt</code> 分块文件</b>和 <b>还原APK.bat</b>，放同一文件夹后双击 <b>还原APK.bat</b>，几秒后生成 <b>共享打印.apk</b>，发到手机安装即可。</p>
-      <p style="margin-top:8px">分块是为了在 GitHub 上存放安装包文件（平台不允许直接上传二进制），还原脚本一键合并，不需要任何操作技巧。</p>
     </div>
   </div>
 </section>
 
 <!-- ===== FAQ ===== -->
-<section>
+<section id="faq">
   <div class="wrap">
     <div class="sec-head">
       <h2>常见问题</h2>
     </div>
     <div class="faq">
       <details>
-        <summary>手机打不开网页？</summary>
-        <p>确认手机和电脑连的是同一个 WiFi；双击 <code>开放防火墙.bat</code>（右键以管理员身份运行）放行端口；电脑 IP 变了就在 cmd 里输 <code>ipconfig</code> 看最新 IPv4 地址。</p>
+        <summary>手机打不开网页 / 连不上服务器？</summary>
+        <p>确认手机和电脑连的是同一个 WiFi；双击服务端目录里的「开放防火墙.bat」（右键以管理员身份运行）放行端口；电脑 IP 变了就在 cmd 里输 <code>ipconfig</code> 看最新 IPv4 地址。</p>
       </details>
       <details>
         <summary>网页打开了但没看到打印机？</summary>
-        <p>检查打印机 USB 是否插好、驱动是否正常；点打印机旁边的刷新按钮；服务启动后才插的打印机，重启一次服务（先 stop.bat 再 start.bat）。</p>
+        <p>检查打印机 USB 是否插好、驱动是否正常；点打印机旁边的刷新按钮；服务启动后才插的打印机，重启一次服务。</p>
       </details>
       <details>
         <summary>开放到外网安全吗？</summary>
-        <p>建议在 config.json 里设置访问密码（pin），之后任何人打开网页都要先输密码。详细的安全提醒见使用说明第八节。</p>
+        <p>建议在 exe 旁的 config.json 里设置访问密码（pin），之后任何人打开网页都要先输密码。详细安全提醒见使用说明第八节。</p>
       </details>
       <details>
         <summary>Word / Excel / PPT 能打吗？</summary>
@@ -262,12 +452,62 @@
   </div>
 </section>
 
+<!-- ===== 更新日志 ===== -->
+<section id="changelog">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>更新日志</h2>
+    </div>
+    <div class="changelog">
+      <div class="cl-item">
+        <div class="cl-head"><b>v1.1 · 服务端打包发布</b><time>2026-10-11</time><span class="tag">服务端</span></div>
+        <ul>
+          <li>服务端打包为免 Python 的单文件 exe（45 MB），双击即用</li>
+          <li>新增分享预置接口（微信/QQ 分享打印入口）与端口防双开</li>
+          <li>首次运行自动生成 config.json，配置写在 exe 同目录，不丢失</li>
+        </ul>
+      </div>
+      <div class="cl-item">
+        <div class="cl-head"><b>v1.9 · 手机端</b><time>2026-10-11</time><span class="tag">手机端</span></div>
+        <ul>
+          <li>微信 / QQ「用其他应用打开」直接选共享打印即可打印</li>
+          <li>打印完成后自动删除手机本地暂存文件，不占空间</li>
+        </ul>
+      </div>
+      <div class="cl-item">
+        <div class="cl-head"><b>v1.0 · 电脑客户端</b><time>2026-10-11</time><span class="tag">电脑端</span></div>
+        <ul>
+          <li>独立桌面应用发布，不依赖浏览器，与服务端分离安装</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="wrap">
-    <span>共享打印 · Web Print Server</span>
+    <span>共享打印 · Web Print Server · 免费开源</span>
     <span>源码仓库 <a href="https://github.com/tsy-yyds/webprint-server">github.com/tsy-yyds/webprint-server</a></span>
   </div>
 </footer>
+
+<script>
+  (function () {
+    var tabs = document.querySelectorAll('.dl-tab');
+    var panels = document.querySelectorAll('.dl-panel');
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].addEventListener('click', function () {
+        var key = this.getAttribute('data-tab');
+        for (var j = 0; j < tabs.length; j++) {
+          tabs[j].classList.toggle('active', tabs[j] === this);
+        }
+        for (var k = 0; k < panels.length; k++) {
+          panels[k].classList.toggle('active', panels[k].id === 'panel-' + key);
+        }
+      });
+    }
+  })();
+</script>
 
 </body>
 </html>
