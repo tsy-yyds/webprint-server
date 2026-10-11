@@ -31,7 +31,19 @@ from pathlib import Path
 
 from flask import Flask, abort, jsonify, request, send_file, send_from_directory
 
-BASE_DIR = Path(__file__).resolve().parent
+# ============================================================ 目录
+# BASE_DIR：程序代码 / 静态资源目录
+#   - 源码运行：工程目录
+#   - exe 打包运行：PyInstaller 解压的临时目录（只读，含 web/）
+# DATA_DIR：用户数据目录（config.json / jobs / logs / 打印输出 / preload / pid.txt）
+#   - exe 打包运行：exe 所在目录（重启不丢失，用户可编辑 config.json）
+if getattr(sys, 'frozen', False):
+    _MEI = Path(getattr(sys, '_MEIPASS', Path(sys.executable).resolve().parent))
+    BASE_DIR = _MEI
+    DATA_DIR = Path(sys.executable).resolve().parent
+else:
+    BASE_DIR = Path(__file__).resolve().parent
+    DATA_DIR = BASE_DIR
 sys.path.insert(0, str(BASE_DIR))
 
 from file_render import (  # noqa: E402
@@ -54,7 +66,7 @@ _DEFAULT_CONFIG = {
     'dpi_quality': {'draft': 150, 'standard': 200, 'high': 300},
 }
 
-CONFIG_PATH = BASE_DIR / 'config.json'
+CONFIG_PATH = DATA_DIR / 'config.json'
 
 
 def load_config():
@@ -76,9 +88,9 @@ PORT = int(CONFIG.get('port', 8000))
 PIN = str(CONFIG.get('pin') or '').strip()
 MAX_UPLOAD = int(CONFIG.get('max_upload_mb', 100)) * 1024 * 1024
 
-JOBS_DIR = BASE_DIR / 'jobs'
-LOGS_DIR = BASE_DIR / 'logs'
-PDF_DIR = BASE_DIR / '打印输出'
+JOBS_DIR = DATA_DIR / 'jobs'
+LOGS_DIR = DATA_DIR / 'logs'
+PDF_DIR = DATA_DIR / '打印输出'
 JOBS_DIR.mkdir(exist_ok=True)
 LOGS_DIR.mkdir(exist_ok=True)
 PDF_DIR.mkdir(exist_ok=True)
@@ -97,7 +109,7 @@ if sys.stdout is not None:
     _logger.addHandler(_console)
 
 # ============================================================ 应用与任务队列
-app = Flask(__name__, static_folder='web', static_url_path='')
+app = Flask(__name__, static_folder=str(BASE_DIR / 'web'), static_url_path='')
 app.config['MAX_CONTENT_LENGTH'] = MAX_UPLOAD
 
 START_TIME = time.time()
@@ -144,7 +156,7 @@ def get_local_ips():
     except Exception:
         pass
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(2)
         s.connect(('223.5.5.5', 80))
         ips.add(s.getsockname()[0])
@@ -266,7 +278,7 @@ def api_print():
 # ============================================================ App 分享预置文件
 # 微信 / QQ 等"用其他应用打开"→ 共享打印 App → 文件先传到这里暂存，
 # 网页打印页通过 ?pre=<id> 自动取回并加入待打印列表（App 与网页版功能一致）。
-PRELOAD_DIR = BASE_DIR / 'preload'
+PRELOAD_DIR = DATA_DIR / 'preload'
 PRELOAD_TTL = 86400  # 24 小时后自动清理
 
 
@@ -527,7 +539,17 @@ def main():
         _log('端口 %d 已被占用，打印服务可能已在运行，本次不重复启动' % PORT)
         raise SystemExit(0)
 
-    (BASE_DIR / 'pid.txt').write_text(str(os.getpid()), encoding='utf-8')
+    # 首次运行（无配置文件时）生成一份默认配置，用户可直接编辑
+    if not CONFIG_PATH.exists():
+        try:
+            CONFIG_PATH.write_text(
+                json.dumps(_DEFAULT_CONFIG, ensure_ascii=False, indent=2),
+                encoding='utf-8')
+            _log('已生成默认配置文件：%s' % CONFIG_PATH)
+        except Exception as e:
+            _log('生成配置文件失败：%s' % e)
+
+    (DATA_DIR / 'pid.txt').write_text(str(os.getpid()), encoding='utf-8')
 
     _log('=' * 56)
     _log('共享打印服务启动')
@@ -540,6 +562,9 @@ def main():
 
     if '--no-tray' not in sys.argv:
         _start_tray()
+        # exe 打包运行（无控制台）：启动后自动打开网页，体验与 start.bat 一致
+        if getattr(sys, 'frozen', False):
+            threading.Timer(1.2, lambda: webbrowser.open('http://127.0.0.1:%d' % PORT)).start()
 
     try:
         app.run(host=HOST, port=PORT, threaded=True, debug=False, use_reloader=False)
