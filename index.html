@@ -29,24 +29,22 @@
   .nav-links a:hover{color:var(--blue);text-decoration:none}
 
   /* ===== Hero ===== */
-  header.hero{padding:76px 0 56px;border-bottom:1px solid var(--line);overflow:hidden}
-  .hero-inner{display:grid;grid-template-columns:1.15fr .85fr;gap:44px;align-items:center}
-  .kicker{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--blue);font-weight:600;background:var(--blue-soft);border-radius:999px;padding:4px 14px;margin-bottom:22px}
-  h1{font-size:42px;line-height:1.22;font-weight:800;letter-spacing:-.5px}
+  header.hero{padding:88px 0 64px;border-bottom:1px solid var(--line);overflow:hidden}
+  .hero-inner{max-width:780px;margin:0 auto;text-align:center}
+  .kicker{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--blue);font-weight:600;background:var(--blue-soft);border-radius:999px;padding:4px 14px;margin-bottom:24px}
+  h1{font-size:44px;line-height:1.22;font-weight:800;letter-spacing:-.5px}
   h1 .accent{color:var(--blue)}
-  .sub{font-size:17px;color:var(--ink-soft);max-width:36em;margin-top:16px}
-  .meta-line{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:26px;font-size:14px;color:var(--ink-soft)}
+  .sub{font-size:17px;color:var(--ink-soft);max-width:34em;margin:18px auto 0}
+  .meta-line{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:26px;font-size:14px;color:var(--ink-soft);justify-content:center}
   .meta-line span{display:inline-flex;align-items:center;gap:6px}
   .meta-line svg{width:14px;height:14px;color:var(--ok)}
-  .cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+  .cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px;justify-content:center}
   .btn{display:inline-flex;align-items:center;gap:9px;padding:13px 24px;border-radius:10px;font-size:15px;font-weight:600;transition:transform .15s ease,box-shadow .15s ease}
   .btn svg{width:17px;height:17px}
   .btn-primary{background:var(--blue);color:#fff;box-shadow:0 2px 10px rgba(27,95,191,.28)}
   .btn-primary:hover{background:var(--blue-deep);transform:translateY(-1px);text-decoration:none}
   .btn-ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
   .btn-ghost:hover{border-color:var(--blue);color:var(--blue);text-decoration:none}
-  .hero-art{display:flex;align-items:center;justify-content:center}
-  .hero-art svg{width:100%;max-width:360px;height:auto}
 
   /* ===== 区块 ===== */
   section{padding:60px 0;border-bottom:1px solid var(--line)}
@@ -135,8 +133,6 @@
     h1{font-size:31px}
     .sub{font-size:16px}
     .hero-inner{grid-template-columns:1fr;gap:30px}
-    .hero-art{order:-1}
-    .hero-art svg{max-width:240px}
     header.hero{padding:52px 0 40px}
     section{padding:44px 0}
     .grid{grid-template-columns:1fr}
@@ -190,45 +186,7 @@
         </a>
       </div>
     </div>
-    <div class="hero-art">
-      <svg viewBox="0 0 360 260" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <ellipse cx="180" cy="236" rx="150" ry="14" fill="#EDEFF2"/>
-        <g stroke="#1B5FBF" stroke-width="2.5" stroke-linecap="round">
-          <path d="M96 118c0-20 16-36 36-36h96c20 0 36 16 36 36v54c0 20-16 36-36 36H132c-20 0-36-16-36-36v-54z"/>
-          <path d="M110 96h140c14 0 24 10 24 24v18H86v-18c0-14 10-24 24-24z"/>
-        </g>
-        <g fill="#fff" stroke="#E0E3E7" stroke-width="1.5">
-          <rect x="132" y="88" width="96" height="44" rx="8"/>
-        </g>
-        <g fill="#1B5FBF">
-          <rect x="150" y="100" width="60" height="6" rx="3"/>
-          <rect x="150" y="114" width="46" height="6" rx="3"/>
-        </g>
-        <g fill="#fff" stroke="#E0E3E7" stroke-width="1.5">
-          <rect x="150" y="150" width="60" height="34" rx="8"/>
-        </g>
-        <circle cx="196" cy="167" r="3.5" fill="#1B5FBF"/>
-        <path d="M228 156l18 10-18 10z" fill="#1B5FBF"/>
-        <g stroke="#9AA4AF" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 6">
-          <path d="M78 178c-10-4-14-14-10-22s16-10 22-4"/>
-          <path d="M282 178c10-4 14-14 10-22s-16-10-22-4"/>
-        </g>
-        <g>
-          <rect x="40" y="204" width="64" height="22" rx="6" fill="#fff" stroke="#E0E3E7" stroke-width="1.5"/>
-          <rect x="48" y="210" width="24" height="10" rx="2" fill="#EAF1FB"/>
-          <path d="M120 202v-6h16v6" stroke="#1B5FBF" stroke-width="2" fill="none"/>
-          <rect x="120" y="204" width="18" height="18" rx="4" fill="#fff" stroke="#E0E3E7" stroke-width="1.5"/>
-        </g>
-        <g>
-          <rect x="256" y="204" width="64" height="22" rx="6" fill="#fff" stroke="#E0E3E7" stroke-width="1.5"/>
-          <rect x="276" y="210" width="28" height="10" rx="2" fill="#EAF1FB"/>
-          <path d="M224 202v-6h16v6" stroke="#1B5FBF" stroke-width="2" fill="none"/>
-          <rect x="222" y="204" width="18" height="18" rx="4" fill="#fff" stroke="#E0E3E7" stroke-width="1.5"/>
-        </g>
-        <text x="180" y="146" text-anchor="middle" font-size="13" font-weight="700" fill="#57606A" font-family="system-ui">USB</text>
-      </svg>
-    </div>
-  </div>
+</div>
 </header>
 
 <!-- ===== 介绍 ===== -->
@@ -336,6 +294,9 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
             下载服务端
           </a>
+          <a class="btn btn-alt" href="https://gh-proxy.com/https://github.com/tsy-yyds/webprint-server/releases/download/v2.0/webprint-server.exe" target="_blank" rel="noopener">镜像 1 · gh-proxy.com</a>
+          <a class="btn btn-alt" href="https://ghfast.top/https://github.com/tsy-yyds/webprint-server/releases/download/v2.0/webprint-server.exe" target="_blank" rel="noopener">镜像 2 · ghfast.top</a>
+          <a class="btn btn-alt" href="https://ghproxy.net/https://github.com/tsy-yyds/webprint-server/releases/download/v2.0/webprint-server.exe" target="_blank" rel="noopener">镜像 3 · ghproxy.net</a>
           <a class="btn btn-alt" href="https://github.com/tsy-yyds/webprint-server/blob/main/使用说明.md">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
             查看使用说明
@@ -369,6 +330,9 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
             获取安卓 App
           </a>
+          <a class="btn btn-alt" href="https://gh-proxy.com/https://github.com/tsy-yyds/webprint-server/releases/download/v2.0/webprint.apk" target="_blank" rel="noopener">镜像 1 · gh-proxy.com</a>
+          <a class="btn btn-alt" href="https://ghfast.top/https://github.com/tsy-yyds/webprint-server/releases/download/v2.0/webprint.apk" target="_blank" rel="noopener">镜像 2 · ghfast.top</a>
+          <a class="btn btn-alt" href="https://ghproxy.net/https://github.com/tsy-yyds/webprint-server/releases/download/v2.0/webprint.apk" target="_blank" rel="noopener">镜像 3 · ghproxy.net</a>
         </div>
         <div class="warn">GitHub 不允许直接存放安装包文件，仓库以 13 个分块 + 还原脚本形式提供：下载全部放入同一文件夹 → 双击「还原APK.bat」→ 生成共享打印.apk → 发到手机安装，一键完成。</div>
       </div>
@@ -398,6 +362,9 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
             获取电脑客户端
           </a>
+          <a class="btn btn-alt" href="https://gh-proxy.com/https://github.com/tsy-yyds/webprint-server/releases/download/v2.0/webprint-desktop-v2.exe" target="_blank" rel="noopener">镜像 1 · gh-proxy.com</a>
+          <a class="btn btn-alt" href="https://ghfast.top/https://github.com/tsy-yyds/webprint-server/releases/download/v2.0/webprint-desktop-v2.exe" target="_blank" rel="noopener">镜像 2 · ghfast.top</a>
+          <a class="btn btn-alt" href="https://ghproxy.net/https://github.com/tsy-yyds/webprint-server/releases/download/v2.0/webprint-desktop-v2.exe" target="_blank" rel="noopener">镜像 3 · ghproxy.net</a>
         </div>
       </div>
     </div>
